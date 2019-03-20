@@ -74,6 +74,23 @@
      }
     }
    },
+   "/apis/cdi.kubevirt.io/v1alpha1/version": {
+    "get": {
+     "description": "get the code version",
+     "operationId": "getCodeVersion",
+     "produces": [
+      "application/json"
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "schema": {
+        "$ref": "#/definitions/io.kubevirt.cdi.pkg.version.Info"
+       }
+      }
+     }
+    }
+   },
    "/apis/cdi.kubevirt.io/v1alpha1/cdis": {
     "get": {
      "produces": [
@@ -2541,7 +2558,43 @@
       "type": "string"
      }
     }
-   }
+   },
+   "io.kubevirt.cdi.pkg.version.Info": {
+    "description": "Info contains versioning information. how we'll want to distribute that information.",
+     "properties": {
+      "buildDate": {
+       "type": "string"
+      },
+      "compiler": {
+       "type": "string"
+      },
+      "gitCommit": {
+       "type": "string"
+      },
+      "gitTreeState": {
+       "type": "string"
+      },
+      "gitVersion": {
+       "type": "string"
+      },
+      "goVersion": {
+       "type": "string"
+      },
+      "platform": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "gitVersion",
+      "gitCommit",
+      "gitTreeState",
+      "buildDate",
+      "goVersion",
+      "compiler",
+      "platform"
+     ],
+     "type": "object"
+    }
   },
   "securityDefinitions": {
    "BearerToken": {
