@@ -242,7 +242,10 @@ func (f *Framework) AfterEach() {
 
 	if ginkgo.CurrentGinkgoTestDescription().Failed {
 		f.reporter.FailureCount++
-		f.reporter.Dump(f.K8sClient, ginkgo.CurrentGinkgoTestDescription().Duration)
+
+		var input string
+		fmt.Fprintf(os.Stderr, "Test failed, press 'Enter' to run the next one...\n")
+		fmt.Scanln(&input)
 	}
 
 	return
