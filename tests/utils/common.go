@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/onsi/ginkgo"
+	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -45,7 +47,27 @@ func getDefaultNodeName(client *kubernetes.Clientset) string {
 	if err != nil {
 		ginkgo.Fail("Unable to list nodes")
 	}
-	return nodes.Items[0].Name
+	for _, node := range nodes.Items {
+		scheduleable := true
+		if node.Spec.Taints != nil {
+			for _, taint := range node.Spec.Taints {
+				if taint.Effect == corev1.TaintEffectNoSchedule {
+					scheduleable = false
+				}
+			}
+		}
+		if node.GetLabels() != nil {
+			if val, ok := node.GetLabels()["node-role.kubernetes.io/master"]; ok && val == "true" {
+				scheduleable = false
+			}
+		}
+		if scheduleable {
+			ginkgo.GinkgoWriter.Write([]byte(fmt.Sprintf("Using node %s as target node for hostpath provisioner if set.\n", node.Name)))
+			return node.Name
+		}
+	}
+	ginkgo.Fail("No scheduleable nodes available")
+	return ""
 }
 
 func getDefaultStorageClass(client *kubernetes.Clientset) *storagev1.StorageClass {
